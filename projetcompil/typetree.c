@@ -43,6 +43,10 @@ strtype *strtype_create_primitiv(type_ml t) {
 	strtype *ret = malloc(sizeof(*ret));
 	ret -> type = t;
 	ret -> son = NULL;
+	ret -> op1 = NULL;
+	ret -> op2 = NULL;
+	ret -> param = NULL;
+	ret -> res = NULL;
 	return ret;
 }
 
@@ -52,6 +56,8 @@ strtype *strtype_create_fun(trtype *param, trtype *res) {
 	ret -> son = NULL;
 	ret -> param = param;
 	ret -> res = res;
+	ret -> op1 = NULL;
+	ret -> op2 = NULL;
 	return ret;
 }
 
@@ -62,6 +68,10 @@ strtype *strtype_upletfuse(trtype *t[], int nbofType)  {
 	for (int i = 1; i < nbofType; ++i) {
 		t[i - 1] -> next = t[i]; 
 	}
+	father -> op1 = NULL;
+	father -> op2 = NULL;
+	father -> param = NULL;
+	father -> res = NULL;
 	return father;
 }
 
@@ -89,6 +99,10 @@ strtype *strtype_create_list(trtype *a) {
 	strtype *ret = malloc(sizeof(*ret));
 	ret -> type = LIST;
 	ret -> son = a;
+	ret -> op1 = NULL;
+	ret -> op2 = NULL;
+	ret -> param = NULL;
+	ret -> res = NULL;
 	
 }
 
@@ -99,6 +113,8 @@ strtype *strtype_create_composite(mloper oper, trtype *a, trtype *b) {
 	ret -> oper = oper;
 	ret -> op1 = a;
 	ret -> op2 = b;
+	ret -> param = NULL;
+	ret -> res = NULL;
 	return ret;
 }
 
@@ -171,7 +187,10 @@ trtype *trtype_create_complex(strtype *t) {
 //Inférence de type need
 bool trtype_cmp (trtype *t1, trtype *t2) {
 	
-	if(t1 == NULL || t2 == NULL || t1 -> iscomplex != t2 -> iscomplex) return false;
+	if(t1 == NULL 
+	|| t2 == NULL 
+	|| t1 -> iscomplex 
+	!= t2 -> iscomplex) return false;
 	if(t1 -> iscomplex) {
 		return strtype_cmp(t1 -> type, t2 -> type);
 	}
@@ -183,8 +202,10 @@ bool trtype_isIn(trtype *t1, trtype *t2) {
 	if (t2 == NULL) return false;
 	if (trtype_isIn(t1, t2 -> next)) return true;
 	if (t2 -> iscomplex) {
-		return (trtype_isIn(t1, t2 -> type -> op1)) || (trtype_isIn(t1, t2 -> type -> op2))
-		|| (trtype_isIn(t1,t2 -> type -> param)) || (trtype_isIn(t1,t2 -> type -> res))
+		return (trtype_isIn(t1, t2 -> type -> op1)) 
+		|| (trtype_isIn(t1, t2 -> type -> op2))
+		|| (trtype_isIn(t1,t2 -> type -> param)) 
+		|| (trtype_isIn(t1,t2 -> type -> res))
 		|| (trtype_isIn(t1,t2 -> type -> son));
 	}
 	
@@ -209,13 +230,14 @@ void trtype_replace(trtype *t, trtype *x, trtype **tr) {
 }
 
 bool trtype_variable(trtype *tr) {
+	if (tr == NULL) return false;
 	if (tr -> iscomplex) {
 		strtype *t = tr -> type; 
 		return trtype_variable(t -> op1) || trtype_variable(t -> op2)
 		|| trtype_variable(t -> son) || trtype_variable(tr -> next) 
 		|| trtype_variable(t -> param) || trtype_variable(t -> res);
 	} else {
-		return false;
+		return true;
 	}
 }
 
