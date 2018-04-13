@@ -89,6 +89,9 @@ bool strtype_cmp(const strtype *t1, const strtype *t2) {
 		if (t1 -> type == FUN) {
 			return trtype_cmp(t1 -> param, t2 -> param) && trtype_cmp(t1 -> res, t2 -> res);
 		}
+		if (t1 -> type == LIST) {
+			return trtype_cmp(t1 -> son, t2 -> son);
+		}
 		return true;
 	}
 	return false;

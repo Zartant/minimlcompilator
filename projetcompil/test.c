@@ -89,8 +89,13 @@ int main(void) {
     trexpr *x2 = trexpr_create_pol(4, "x");
     trexpr *conc = trexpr_create_composite(CONCATLIST, c2, x2, trtype_create_pol(5));
     
-    int v = 3;
-    trexpr *insert = trexpr_create_composite(PUTLIST, trexpr_create(INTEGER, &v, ""), conc, trtype_create_pol(18));
+    char v[50] = "";
+    int v2 = 3;
+    trexpr *texpr[2];
+    texpr[0] = trexpr_create(STRING, v, "");
+    texpr[1] = trexpr_create(INTEGER, &v2, ""); 
+    trexpr *couple = trexpr_upletfuse(texpr, 2, trtype_create_pol(23));
+    trexpr *insert = trexpr_create_composite(PUTLIST, couple, conc, trtype_create_pol(18));
     trexpr *f1 = trexpr_create_fun(c1, insert, trtype_create_pol(6));
     trexpr *f = trexpr_create_fun(x1, f1, trtype_create_pol(7)); 
     printf("patate\n");

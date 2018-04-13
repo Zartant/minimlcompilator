@@ -95,7 +95,24 @@ void apply_context(trexpr **exp, env *ctx, G *ctrset) {
 	    add_constraint(ctrset, (*exp) -> treetype, trtype_create_complex(strtype_create_fun((*exp) -> param -> treetype, (*exp) -> res -> treetype)));
 
 
-	} else if ((*exp) -> type == OPE) {
+	} else if ((*exp) -> type == TREE) {
+	   	trexpr **p = &((*exp) -> son);
+	   	trtype *tab[20];
+	   	int i = 0;
+	   	while (*p != NULL) {
+			apply_context(p, ctx, ctrset);
+			tab[i] = (*p) -> treetype;
+			i++;
+			p = (*p) -> next;
+		}
+		if (i == 0) {
+			printf("Argh");
+			//GESTION de l'erreur, probablement retour -1;
+		} else {
+			add_constraint(ctrset, (*exp) -> treetype, trtype_create_complex(strtype_upletfuse(tab, i + 1)));
+		}
+		
+    } else if ((*exp) -> type == OPE) {
 		if ((*exp) -> oper == LETIN) {
 			add_to_a_context(&((*exp)  -> op1), ctx, ctrset);
 			apply_context(&((*exp)-> op2), ctx, ctrset);

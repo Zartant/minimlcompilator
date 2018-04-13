@@ -96,6 +96,7 @@ int infer_type(G *g) {
 		printf("G :\n");
 		print_constraint_set(g);
 		if (trtype_cmp((*c) -> t1, (*c) -> t2)) {
+			printf("eq decision\n");
 			*c = (*c) -> next;
 			c = start;
 			i = 1;
@@ -107,10 +108,12 @@ int infer_type(G *g) {
 			add_constraint(g, trtype_get_res((*c) -> t1),trtype_get_res((*c) -> t2));
 			c = start;
 			i = 1;
+			printf("fun decision\n");
 		} else if (!trtype_is_complex((*c) -> t1)){
 			 replace_in_constraint(g, (*c) -> t1, (*c) -> t2);
 			 c = start;
 			 i = 1;
+			 printf("replace pol decision\n");
 		} else if (!trtype_variable((*c) -> t1)) {
 			trtype *buf;
 			buf = (*c) -> t1;
@@ -118,10 +121,12 @@ int infer_type(G *g) {
 			(*c) -> t2 = buf;
 			c = start;
 			i = 1;
+			printf("invert decision\n");
 		} else if (!trtype_isIn((*c) -> t1, (*c) -> t2) && type_in_constraint(g, (*c) -> t1, i)) {
 			replace_in_constraint(g, (*c) -> t1, (*c) -> t2);
 			c = start;
 			i = 1;
+			printf("replace type decision\n");
 		} else {
 			i++;
 			c = start;
