@@ -38,6 +38,18 @@ void add_constraint(G *g, trtype *t1, trtype *t2) {
 	g -> liste = new;
 }
 
+void put_constraint(G *g, trtype *t1, trtype *t2) {
+	constrain *new = malloc(sizeof(*new));
+	new -> t1 = t1;
+	new -> t2 = t2;
+	new -> next = NULL;
+	constrain *p = g -> liste;
+	while (p -> next != NULL) {
+		p = p -> next;
+	}
+	p -> next = new;
+}
+
 int get_listepol(G *g){
 	return g -> listepol;
 }
@@ -78,6 +90,20 @@ bool type_in_constraint(G *g, trtype *t, int except) {
 	}
 }
 
+void add_constraint_within_complex(G *g, trtype *t, trtype *x) {
+	if (t != NULL && x != NULL) {
+		if (trtype_is_complex(t) == trtype_is_complex(x)) {
+			if (trtype_is_complex(t)) {
+				add_constraint_within_complex(g, trtype_get_son(t), trtype_get_son(x));
+				add_constraint_within_complex(g, trtype_get_next(t), trtype_get_next(x));
+			} else {
+				put_constraint(g, t, x);
+			}
+		}
+	}
+}
+
+
 void replace_in_constraint(G *g, trtype *t, trtype *x) {
 	constrain *c = g -> liste;
 	while (c != NULL) {
@@ -104,8 +130,8 @@ int infer_type(G *g) {
 					&& (trtype_is_fun((*c) -> t2))) {
 			constrain *free_con = *c;
 			*c = (*c) -> next;
-			add_constraint(g, trtype_get_param((*c) -> t1), trtype_get_param((*c) -> t2));
-			add_constraint(g, trtype_get_res((*c) -> t1),trtype_get_res((*c) -> t2));
+			put_constraint(g, trtype_get_param((*c) -> t1), trtype_get_param((*c) -> t2));
+			put_constraint(g, trtype_get_res((*c) -> t1),trtype_get_res((*c) -> t2));
 			c = start;
 			i = 1;
 			printf("fun decision\n");
@@ -122,7 +148,24 @@ int infer_type(G *g) {
 			c = start;
 			i = 1;
 			printf("invert decision\n");
-		} else if (!trtype_isIn((*c) -> t1, (*c) -> t2) && type_in_constraint(g, (*c) -> t1, i)) {
+		} else if (!trtype_is_complex((*c) -> t2) && trtype_variable((*c) -> t1) && trtype_is_complex((*c) -> t1)) {
+			
+			trtype *buf;
+			buf = (*c) -> t1;
+			(*c) -> t1 = (*c) -> t2;
+			(*c) -> t2 = buf;
+			c = start;
+			i = 1;
+			printf("invert decision2\n");
+			
+		} else if (trtype_is_complex((*c) -> t1) && trtype_is_complex((*c) -> t2) && trtype_variable((*c) -> t1) && trtype_variable((*c) -> t2)){
+			add_constraint_within_complex(g, ((*c) -> t1), ((*c) -> t2));
+			replace_in_constraint(g, (*c) -> t1, (*c) -> t2);
+			c = start;
+			i = 1;
+			printf("replace type decision full complex\n");
+			
+        } else if (!trtype_isIn((*c) -> t1, (*c) -> t2) && type_in_constraint(g, (*c) -> t1, i)) {
 			replace_in_constraint(g, (*c) -> t1, (*c) -> t2);
 			c = start;
 			i = 1;

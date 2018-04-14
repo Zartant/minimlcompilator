@@ -271,3 +271,18 @@ trtype *trtype_get_res (trtype *t) {
 		return NULL;
 	}
 }
+
+trtype *trtype_get_son (trtype *t) {
+	if (t -> iscomplex) {
+		return t -> type -> son;
+	} else {
+		return NULL;
+	}
+}
+trtype *trtype_get_next (trtype *t) {
+	if (t -> iscomplex) {
+		return t -> next;
+	} else {
+		return NULL;
+	}
+}

@@ -38,6 +38,7 @@ bool trtype_is_complex(trtype *t);
 bool trtype_is_fun(trtype *t);
 trtype *trtype_get_res (trtype *t);
 trtype *trtype_get_param (trtype *t);
-
+trtype *trtype_get_son (trtype *t);
+trtype *trtype_get_next (trtype *t);
 
 #endif //_TYPE_TREE

@@ -103,13 +103,14 @@ void apply_context(trexpr **exp, env *ctx, G *ctrset) {
 			apply_context(p, ctx, ctrset);
 			tab[i] = (*p) -> treetype;
 			i++;
-			p = (*p) -> next;
+			p = &((*p) -> next);
+			printf("calculus n-uplet : %d\n", i);
 		}
 		if (i == 0) {
 			printf("Argh");
 			//GESTION de l'erreur, probablement retour -1;
 		} else {
-			add_constraint(ctrset, (*exp) -> treetype, trtype_create_complex(strtype_upletfuse(tab, i + 1)));
+			add_constraint(ctrset, (*exp) -> treetype, trtype_create_complex(strtype_upletfuse(tab, i)));
 		}
 		
     } else if ((*exp) -> type == OPE) {

@@ -70,7 +70,7 @@ trexpr *trexpr_upletfuse(trexpr *t[], int nbofType, trtype *typ)  {
 	father -> type = TREE;
 	father -> son = t[0];
 	father -> treetype = typ;
-	for (int i = 1; i < nbofType; ++i) {
+	for (int i = 1; i <= nbofType; ++i) {
 		t[i - 1] -> next = t[i]; 
 	}
 	return father;
