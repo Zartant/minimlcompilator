@@ -6,6 +6,7 @@
 #*\n 	{} // On vire d'abord les commentaires
 ["]*["]			{return STRING;}
 let				{return LET;}
+rec				{return RECORD;}
 [0-9]* 			{return INT;} 
 ([0-9]*[.][0-9]*){return FLOAT;}
 [a-z][a-z0-9]*	{return ID;}
