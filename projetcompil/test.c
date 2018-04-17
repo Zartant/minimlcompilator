@@ -89,7 +89,7 @@ int main(void) {
     trexpr *x2 = trexpr_create_pol(4, "x");
     trexpr *conc = trexpr_create_composite(CONCATLIST, c2, x2, trtype_create_pol(5));
     
-    char v[50] = "";
+    /*char v[50] = "";
     int v2 = 3;
     trexpr *texpr[2];
     texpr[0] = trexpr_create(STRING, v, "");
@@ -107,6 +107,22 @@ int main(void) {
     infer_type(g);
     printf("\nG valeurs : \n");
     print_constraint_set(g);
+    */
+    int n1 = 6;
+    int n2 = 2;
+    int n3 = 3;
+    trexpr *b1 = trexpr_create(INTEGER, &n1, "");
+    trexpr *b2 = trexpr_create(INTEGER, &n2, "");
+    trexpr *b3 = trexpr_create(INTEGER, &n3, "");
+    trexpr *tb[2];
+    tb[0] = b2;
+    tb[1] = b3;
+    trexpr *tbexp = trexpr_upletfuse(tb, 2, trtype_create_pol(5));
+    trexpr *p2 = trexpr_create_composite(PUTLIST, tbexp, trexpr_create(LIST, NULL, ""), trtype_create_pol(2));
+    trexpr *p1 = trexpr_create_composite(PUTLIST, b1, p2, trtype_create_pol(3));
+    
+    printf("Test expression :\nEval de [6,(2*3)]\n");
+    printf("Res : ");print_expr(p1);printf("\n");
     
 
 

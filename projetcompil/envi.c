@@ -164,3 +164,94 @@ void apply_context(trexpr **exp, env *ctx, G *ctrset) {
 	} 
 
 }
+
+
+
+trexpr *copy_expr (trexpr *expr) {
+	if (expr == NULL) {
+		return NULL;
+	}
+	trexpr *ret = malloc(sizeof(*ret));
+	ret -> treetype = expr -> treetype;
+	ret -> type = expr -> type;
+	ret -> son = copy_expr(expr -> son);
+	ret -> next = copy_expr(expr -> next);
+	ret -> oper = expr -> oper;
+	ret -> op1 = copy_expr(expr -> op1);
+	ret -> op2 = copy_expr(expr -> op2);
+	return ret;
+}
+
+int eval_operation(trexpr **expr, env *ctx) {
+	int r1 = evaluate_expr(&((*expr) -> op1), ctx);
+	int r2 = evaluate_expr(&((*expr) -> op2), ctx);
+	//Test retour r1
+	
+	if ((*expr)-> type == OPE) {
+		if ((*expr) -> oper == INTPLUS) {
+			int *v1 = malloc(sizeof(int));
+			v1 = (*expr) -> op1 -> value;
+		    int *v2 = malloc(sizeof(int));
+		    v2 = (*expr) -> op2 -> value;
+		    int *ret = malloc(sizeof(int));
+		    *ret = *v1 + *v2;
+		    *expr = trexpr_create(INTEGER, ret, ""); 
+		} else if ((*expr) -> oper == APPLY) {
+			env *nctx = new_context();
+			concat_context(nctx, ctx);
+			add_value(nctx, (*expr) -> op1 -> param -> ID , (*expr) -> op2);
+			*expr = (*expr)-> op1 -> res;
+			evaluate_expr(expr, nctx); //Test retour
+		}
+	}
+}
+
+int evaluate_expr(trexpr **expr, env *ctx) {
+	if ((*expr) == NULL) {
+		return -1;
+	}
+	if ((*expr) -> type == POLY) {
+		*expr = copy_expr(getvar(ctx, (*expr) -> ID));
+	} else if ((*expr) -> type == OPE || (*expr) -> type == FUN) {
+		return eval_operation(expr, ctx);
+	} else if ((*expr) -> type == TREE) {
+		trexpr **p = &((*expr) -> son);
+		while (*p != NULL) {
+			evaluate_expr(p, ctx);
+			p = &((*p) -> next);
+		}
+	}
+		
+}
+
+void print_list(trexpr *expr) {
+	print_expr(expr -> op1);
+	if (expr -> op2 -> oper == PUTLIST) {
+		printf(";");
+		print_list(expr -> op2);
+	} else if (expr -> op2 -> type == LIST) {
+		printf("]");
+	}
+}
+
+void print_expr(trexpr *expr) {
+	if (expr -> type == TREE) {
+	   printf("(");
+	   trexpr *p = expr -> son;
+	   while (p != NULL) {
+		  print_expr(p);
+		  p = p -> next;
+		  if (p != NULL) printf(",");
+	   }
+	   printf(")");
+	} else if (expr -> type == OPE) { // c'est forcément un INPUTLIST
+		printf("[");
+		print_expr(expr -> op1);
+		
+	} else if (expr -> type == LIST) { //liste vide
+		printf("[]");
+	} else if (expr -> type == INTEGER) {
+		printf("%d", *((int *)(expr -> value)));
+	}
+	
+}
