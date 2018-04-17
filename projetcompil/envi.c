@@ -27,12 +27,12 @@ void add_value(env *e, char *id, trexpr *ex) {
 
 void concat_context(env *e1, env *e2) {
 	var *p = e1 -> liste;
-	while (p != NULL) {
-		p = p -> next;
-	}
 	if (p == NULL) {
 		e1 -> liste = e2 -> liste;
 	} else {
+		while (p != NULL) {
+		    p = p -> next;
+		}
 		p -> next = e2 -> liste;
 	}
 }
