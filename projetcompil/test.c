@@ -89,7 +89,7 @@ int main(void) {
     trexpr *x2 = trexpr_create_pol(4, "x");
     trexpr *conc = trexpr_create_composite(CONCATLIST, c2, x2, trtype_create_pol(5));
     
-    /*char v[50] = "";
+    char v[50] = "";
     int v2 = 3;
     trexpr *texpr[2];
     texpr[0] = trexpr_create(STRING, v, "");
@@ -107,7 +107,7 @@ int main(void) {
     infer_type(g);
     printf("\nG valeurs : \n");
     print_constraint_set(g);
-    */
+    
     int n1 = 6;
     int n2 = 2;
     int n3 = 3;

@@ -99,13 +99,15 @@ void apply_context(trexpr **exp, env *ctx, G *ctrset) {
 	   	trexpr **p = &((*exp) -> son);
 	   	trtype *tab[20];
 	   	int i = 0;
-	   	while (*p != NULL) {
+	   	if (*p == NULL) printf("ERROOR");
+	   	do {
 			apply_context(p, ctx, ctrset);
 			tab[i] = (*p) -> treetype;
 			i++;
+			if ((*p) -> next == NULL) break;
 			p = &((*p) -> next);
 			printf("calculus n-uplet : %d\n", i);
-		}
+		} while (*p != NULL);
 		if (i == 0) {
 			printf("Argh");
 			//GESTION de l'erreur, probablement retour -1;
@@ -246,7 +248,7 @@ void print_expr(trexpr *expr) {
 	   printf(")");
 	} else if (expr -> type == OPE) { // c'est forcément un INPUTLIST
 		printf("[");
-		print_expr(expr -> op1);
+		print_list(expr -> op1);
 		
 	} else if (expr -> type == LIST) { //liste vide
 		printf("[]");
