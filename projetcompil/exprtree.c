@@ -51,6 +51,8 @@ trexpr *trexpr_create(type_ml t, void *value, char *id){
 	ret -> type = t;
 	ret -> son = NULL;
 	ret -> next = NULL;
+	ret -> op1 = NULL;
+	ret -> op2 = NULL;
 	return ret;
 }
 

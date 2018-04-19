@@ -204,6 +204,8 @@ int eval_operation(trexpr **expr, env *ctx) {
 			add_value(nctx, (*expr) -> op1 -> param -> ID , (*expr) -> op2);
 			*expr = (*expr)-> op1 -> res;
 			evaluate_expr(expr, nctx); //Test retour
+		} else if ((*expr) -> oper == CONCATLIST) {
+			
 		}
 	}
 }
@@ -214,9 +216,12 @@ int evaluate_expr(trexpr **expr, env *ctx) {
 	}
 	if ((*expr) -> type == POLY) {
 		*expr = copy_expr(getvar(ctx, (*expr) -> ID));
-	} else if ((*expr) -> type == OPE || (*expr) -> type == FUN) {
+	} else if ((*expr) -> type == OPE) {
 		return eval_operation(expr, ctx);
-	} else if ((*expr) -> type == TREE) {
+	} else if ((*expr) -> type == FUN) {
+		return evaluate_expr(&((*expr) -> param), ctx);
+		return evaluate_expr(&((*expr) -> res), ctx);
+	}else if ((*expr) -> type == TREE) {
 		trexpr **p = &((*expr) -> son);
 		while (*p != NULL) {
 			evaluate_expr(p, ctx);
@@ -228,7 +233,7 @@ int evaluate_expr(trexpr **expr, env *ctx) {
 
 void print_list(trexpr *expr) {
 	print_expr(expr -> op1);
-	if (expr -> op2 -> oper == PUTLIST) {
+	if (expr -> op2 -> type == OPE && expr -> op2 -> oper == PUTLIST) {
 		printf(";");
 		print_list(expr -> op2);
 	} else if (expr -> op2 -> type == LIST) {
@@ -237,7 +242,10 @@ void print_list(trexpr *expr) {
 }
 
 void print_expr(trexpr *expr) {
-	if (expr -> type == TREE) {
+	if (expr == NULL) printf("ah");
+	if (expr -> type == FUN) {
+		printf("< fun >");
+	} else if (expr -> type == TREE) {
 	   printf("(");
 	   trexpr *p = expr -> son;
 	   while (p != NULL) {
@@ -248,7 +256,7 @@ void print_expr(trexpr *expr) {
 	   printf(")");
 	} else if (expr -> type == OPE) { // c'est forcément un INPUTLIST
 		printf("[");
-		print_list(expr -> op1);
+		print_list(expr);
 		
 	} else if (expr -> type == LIST) { //liste vide
 		printf("[]");
