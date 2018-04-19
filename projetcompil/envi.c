@@ -168,6 +168,17 @@ void apply_context(trexpr **exp, env *ctx, G *ctrset) {
 }
 
 
+void *cpyvaluexpr(trexpr *expr) {
+	if (expr -> value == NULL) {
+		return NULL;
+	}
+	
+	if (expr -> type == INTEGER) {
+		int *v = malloc(sizeof(*v));
+		*v = *((int *)(expr -> value));
+		return v;
+	}
+}
 
 trexpr *copy_expr (trexpr *expr) {
 	if (expr == NULL) {
@@ -181,8 +192,11 @@ trexpr *copy_expr (trexpr *expr) {
 	ret -> oper = expr -> oper;
 	ret -> op1 = copy_expr(expr -> op1);
 	ret -> op2 = copy_expr(expr -> op2);
+	ret -> value = cpyvaluexpr(expr);
 	return ret;
 }
+
+
 
 int eval_operation(trexpr **expr, env *ctx) {
 	int r1 = evaluate_expr(&((*expr) -> op1), ctx);
@@ -202,10 +216,17 @@ int eval_operation(trexpr **expr, env *ctx) {
 			env *nctx = new_context();
 			concat_context(nctx, ctx);
 			add_value(nctx, (*expr) -> op1 -> param -> ID , (*expr) -> op2);
-			*expr = (*expr)-> op1 -> res;
+			*expr = (*expr) -> op1 -> res;
 			evaluate_expr(expr, nctx); //Test retour
 		} else if ((*expr) -> oper == CONCATLIST) {
-			
+			if ((*expr) -> op1 -> type = LIST) {
+				*expr = (*expr) -> op2;
+			} else if ((*expr)-> op1 -> type = PUTLIST){
+				trexpr *p = (*expr) -> op1 -> op2;
+				(*expr) -> op1 -> op2 = (*expr) -> op2;
+			    (*expr) -> op2 = (*expr) -> op1;
+			    (*expr) -> op1 = p;
+			}
 		}
 	}
 }

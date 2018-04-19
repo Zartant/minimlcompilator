@@ -13,7 +13,12 @@ trexpr *trexpr_create_pol(int val, char *id) {
 	strcpy(ret -> ID, id);
 	ret -> treetype = trtype_create_pol(val);
 	ret -> type = POLY;
+	ret -> res = NULL;
+	ret -> param = NULL;
+	ret -> son = NULL;
 	ret -> next = NULL;
+	ret -> op1 = NULL;
+	ret -> op2 = NULL;
 	return ret;
 }
 
@@ -47,7 +52,8 @@ trexpr *trexpr_create(type_ml t, void *value, char *id){
 			strcpy(ret -> ID, id);
 		}
 	}
-	
+	ret -> res = NULL;
+	ret -> param = NULL;
 	ret -> type = t;
 	ret -> son = NULL;
 	ret -> next = NULL;
@@ -64,6 +70,9 @@ trexpr *trexpr_create_fun(trexpr *param, trexpr *res, trtype *t) {
 	ret -> son = NULL;
 	ret -> param = param;
 	ret -> res = res;
+	ret -> op1 = NULL;
+	ret -> op2 = NULL;
+	ret -> value = NULL;
 	return ret;
 }
 
@@ -76,9 +85,16 @@ trexpr *trexpr_upletfuse(trexpr *t[], int nbofType, trtype *typ)  {
 		t[i - 1] -> next = t[i]; 
 	}
 	father -> next = NULL;
+	father -> op1 = NULL;
+	father -> op2 = NULL;
+	father -> param = NULL;
+	father -> res = NULL;
+	father -> value = NULL;
 	return father;
+	
 }
 
+//Plus trop certain de l'utilité
 bool trexpr_cmp(const trexpr *t1, const trexpr *t2) {
 	if (t1 -> type == TREE && t2 -> type == TREE) {
 		trexpr *pt1 = t1 -> son;
@@ -113,6 +129,7 @@ trexpr *trexpr_create_composite(mloper oper, trexpr *a, trexpr *b, trtype *t) {
 	ret -> oper = oper;
 	ret -> op1 = a;
 	ret -> op2 = b;
+	ret -> value = NULL;
 	return ret;
 }
 

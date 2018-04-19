@@ -107,7 +107,7 @@ int main(void) {
     infer_type(g);
     printf("\nG valeurs : \n");
     print_constraint_set(g);
-    /*
+    
     int n1 = 6;
     int n2 = 2;
     int n3 = 3;
@@ -120,7 +120,7 @@ int main(void) {
     trexpr *tbexp = trexpr_upletfuse(tb, 2, trtype_create_pol(5));
     trexpr *p2 = trexpr_create_composite(PUTLIST, tbexp, trexpr_create(LIST, NULL, ""), trtype_create_pol(2));
     trexpr *p1 = trexpr_create_composite(PUTLIST, b1, p2, trtype_create_pol(3));
-    */
+    
     
     if (evaluate_expr(&f, ctx) == -1) {
 		printf("error");
@@ -128,6 +128,8 @@ int main(void) {
    
     printf("Res : ");print_expr(f);printf("\n");
 }
+    trexpr *cpy = copy_expr(p1);
+    printf("Test copy : "); print_expr(cpy); printf("\n");
 
 
     return 0; 
