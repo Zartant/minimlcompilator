@@ -1,11 +1,18 @@
-
+SHELL=/bin/sh
+LEX=flex
+YACC=bison
 CC=gcc
 CFLAGS=-g -std=c11 -pedantic -Wall
+LDFLAGS=-ly
 
+LEXOPTS=-D_POSIX_SOURCE -DYY_NO_INPUT --nounput
 
 all : test
 
 test : test.o typetree.o exprtree.o envi.o typecontr.o
+
+lexer.yy.c: lexer.l
+	$(LEX) $(LEXOPTS) $<
 
 test.o : test.c typetree.c typetree.h mltype.h
 
