@@ -18,7 +18,7 @@ env *new_context() {
 void add_value(env *e, char *id, trexpr *ex) {
 	var *new = malloc(sizeof(*new));
 	new -> next = e -> liste;
-	strcpy(new -> id, id);
+	new -> id = id;
 	new -> expr = ex;
 	e -> liste = new;
 }
@@ -39,7 +39,20 @@ void concat_context(env *e1, env *e2) {
 
 trexpr *getvar(env *e, char *id) {
 	var *p = e -> liste;
-	while (p != NULL && strcmp(p -> id, id) != 0) {
+	while (p != NULL) {
+		if (strcmp(p -> id, id) == 0) {
+			return p -> expr;
+		}
+		p = p -> next;
+	}
+	return NULL;
+}
+
+void print_env (env *e) {
+	var *p = e -> liste;
+	while (p != NULL) {
+		printf("%s : ", p -> id);
+		print_expr(p -> expr);
 		p = p -> next;
 	}
 	if (p == NULL) return NULL;
@@ -215,13 +228,13 @@ int eval_operation(trexpr **expr, env *ctx) {
 		} else if ((*expr) -> oper == APPLY) {
 			env *nctx = new_context();
 			concat_context(nctx, ctx);
-			add_value(nctx, (*expr) -> op1 -> param -> ID , (*expr) -> op2);
+			add_value(nctx, (*expr) -> op1 -> param -> ID , copy_expr((*expr) -> op2));
 			*expr = (*expr) -> op1 -> res;
 			evaluate_expr(expr, nctx); //Test retour
 		} else if ((*expr) -> oper == CONCATLIST) {
-			if ((*expr) -> op1 -> type = LIST) {
+			if ((*expr) -> op1 -> type == LIST) {
 				*expr = (*expr) -> op2;
-			} else if ((*expr)-> op1 -> type = PUTLIST){
+			} else if ((*expr)-> op1 -> type == PUTLIST){
 				trexpr *p = (*expr) -> op1 -> op2;
 				(*expr) -> op1 -> op2 = (*expr) -> op2;
 			    (*expr) -> op2 = (*expr) -> op1;
@@ -236,7 +249,13 @@ int evaluate_expr(trexpr **expr, env *ctx) {
 		return -1;
 	}
 	if ((*expr) -> type == POLY) {
-		*expr = copy_expr(getvar(ctx, (*expr) -> ID));
+		printf("rempl %s", (*expr) -> ID);
+		//*expr = copy_expr(getvar(ctx, (*expr) -> ID));
+		*expr = getvar(ctx, (*expr) -> ID);
+		if(*expr == NULL) {
+			printf("kazepoajdpoajqjdosq\n");
+		}
+		return 0;
 	} else if ((*expr) -> type == OPE) {
 		return eval_operation(expr, ctx);
 	} else if ((*expr) -> type == FUN) {

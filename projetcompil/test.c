@@ -121,16 +121,28 @@ int main(void) {
     trexpr *p2 = trexpr_create_composite(PUTLIST, tbexp, trexpr_create(LIST, NULL, ""), trtype_create_pol(2));
     trexpr *p1 = trexpr_create_composite(PUTLIST, b1, p2, trtype_create_pol(3));
     
+    trexpr *param1 = trexpr_create_composite(APPLY, f, trexpr_create(LIST,NULL, ""), trtype_create_pol(19));
+    trexpr *param2 = trexpr_create_composite(APPLY, param1, trexpr_create(LIST,NULL, ""), trtype_create_pol(19));
     
+    /*
     if (evaluate_expr(&f, ctx) == -1) {
 		printf("error");
 	} else {
    
     printf("Res : ");print_expr(f);printf("\n");
-}
+}*/
     trexpr *cpy = copy_expr(p1);
     printf("Test copy : "); print_expr(cpy); printf("\n");
-
-
+	env *envi = new_context();
+	char chaine[
+	add_value(envi, chaine, cpy);
+	print_env(envi);
+	trexpr *eval1 = trexpr_create_pol(1, chaine);
+	evaluate_expr(&eval1, ctx);
+	if (eval1 == NULL) {
+		printf("à l'aide");
+	} else {
+		print_expr(eval1);
+	}
     return 0; 
 }
