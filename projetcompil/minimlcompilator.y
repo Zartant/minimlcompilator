@@ -35,23 +35,14 @@ void empile_expr(char* n){
 
 void prelude();
 void epilogue();
-static int polnb = 0
+static int polnb = 0;
+
+
+static int exprlblnb =0:
 int get_next_pol_type(){
 	return ++polnb;
 }
 
-void rand_str(char *dest, size_t length) {
-    srand((unsigned int)time(NULL));
-    char charset[] = "0123456789"
-                     "abcdefghijklmnopqrstuvwxyz"
-                     "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    while (length-- > 0) {
-        size_t index = (size_t) rand() / RAND_MAX
-          * (sizeof charset - 1);
-        *dest++ = charset[index];
-    }
-    *dest = '\0';
-}
 
 %}
 %union {
@@ -78,41 +69,79 @@ void rand_str(char *dest, size_t length) {
 
 expr : expr PLUS expr {
 	//Quand on va devoir désallouer ces etiquettes il faudra s'en souvenir...
-	char* e = rand_str(e,10);
-	char* f = rand_str(f,10);
+	char* e = strcat("e",atoi(exprlblnb));
+	char* f = strcat("e",atoi(exprlblnb));
 	empile_expr(e);
 	empile_expr(f);
-	dprintf("trexpr* %s trexpr_create(INTEGER, %d);\n",$1,rand_str(e,10));
-    dprintf("trexpr* %s = trexpr_create_composite(INTPLUS, %s, %s, trtype_create_pol(%d) );\n",e,f, get_next_pol_type()); 
-	dprintf("trexpr* %s trexpr_create(INTEGER, %d);\n",$3,rand_str(e,10));
+	dprintf("trexpr* %s trexpr_create(INTEGER, %d);\n",$1,e);
+    dprintf("trexpr* %s = trexpr_create_composite(INTPLUS, %s, %s, trtype_create_pol(%d) );\n",e,f, get_next_pol); 
+	dprintf("trexpr* %s trexpr_create(INTEGER, %d);\n",$3,f);
 }
 |expr : expr MINUS expr {
-	char* e = rand_str(e,10);
-	char* f = rand_str(f,10);
+	char* e = strcat("e",atoi(exprlblnb));
+	char* f = strcat("e",atoi(exprlblnb));
 	empile_expr(e);
 	empile_expr(f);
-	dprintf("trexpr* %s trexpr_create(INTEGER, %d);\n",$1,rand_str(e,10));
-    dprintf("trexpr* %s = trexpr_create_composite(INTMINUS, %s, %s, trtype_create_pol(%d) );\n",e,f, get_next_pol_type()); 
-	dprintf("trexpr* %s trexpr_create(INTEGER, %d);\n",$3,rand_str(e,10));
+	dprintf("trexpr* %s trexpr_create(INTEGER, %d);\n",$1,e);
+    dprintf("trexpr* %s = trexpr_create_composite(INTPLUS, %s, %s, trtype_create_pol(%d) );\n",e,f, get_next_pol); 
+	dprintf("trexpr* %s trexpr_create(INTEGER, %d);\n",$3,f);
 }
 |expr : expr TIMES expr {
-	char* e = rand_str(e,10);
-	char* f = rand_str(f,10);
+	char* e = strcat("e",atoi(exprlblnb));
+	char* f = strcat("e",atoi(exprlblnb));
 	empile_expr(e);
 	empile_expr(f);
-	dprintf("trexpr* %s trexpr_create(INTEGER, %d);\n",$1,rand_str(e,10));
-    dprintf("trexpr* %s = trexpr_create_composite(INTTIMES, %s, %s, trtype_create_pol(%d) );\n",e,f, get_next_pol_type()); 
-	dprintf("trexpr* %s trexpr_create(INTEGER, %d);\n",$3,rand_str(e,10));
+	dprintf("trexpr* %s trexpr_create(INTEGER, %d);\n",$1,e);
+    dprintf("trexpr* %s = trexpr_create_composite(INTPLUS, %s, %s, trtype_create_pol(%d) );\n",e,f, get_next_pol); 
+	dprintf("trexpr* %s trexpr_create(INTEGER, %d);\n",$3,f);
 }
-|expr : expr DIVIDE {
-	char* e = rand_str(e,10);
-	char* f = rand_str(f,10);
+|expr : expr DIVIDE expr {
+	char* e = strcat("e",atoi(exprlblnb));
+	char* f = strcat("e",atoi(exprlblnb));
 	empile_expr(e);
 	empile_expr(f);
-	dprintf("trexpr* %s trexpr_create(INTEGER, %d);\n",$1,rand_str(e,10));
-    dprintf("trexpr* %s = trexpr_create_composite(INTDIVIDE, %s, %s, trtype_create_pol(%d) );\n",e,f, get_next_pol_type()); 
-	dprintf("trexpr* %s trexpr_create(INTEGER, %d);\n",$3,rand_str(e,10));
+	dprintf("trexpr* %s trexpr_create(INTEGER, %d);\n",$1,e);
+    dprintf("trexpr* %s = trexpr_create_composite(INTPLUS, %s, %s, trtype_create_pol(%d) );\n",e,f, get_next_pol); 
+	dprintf("trexpr* %s trexpr_create(INTEGER, %d);\n",$3,f);
 }
+|expr : expr PLUS expr {
+	//Quand on va devoir désallouer ces etiquettes il faudra s'en souvenir...
+	char* e = strcat("e",atoi(exprlblnb));
+	char* f = strcat("e",atoi(exprlblnb));
+	empile_expr(e);
+	empile_expr(f);
+	dprintf("trexpr* %s trexpr_create(FLOAT, %d);\n",$1,e);
+    dprintf("trexpr* %s = trexpr_create_composite(FLPLUS, %s, %s, trtype_create_pol(%d) );\n",e,f, get_next_pol); 
+	dprintf("trexpr* %s trexpr_create(FLOAT, %d);\n",$3,f);
+}
+|expr : expr MINUS expr {
+	char* e = strcat("e",atoi(exprlblnb));
+	char* f = strcat("e",atoi(exprlblnb));
+	empile_expr(e);
+	empile_expr(f);
+	dprintf("trexpr* %s trexpr_create(FLOAT, %d);\n",$1,e);
+    dprintf("trexpr* %s = trexpr_create_composite(FLMINUS, %s, %s, trtype_create_pol(%d) );\n",e,f, get_next_pol); 
+	dprintf("trexpr* %s trexpr_create(FLOAT, %d);\n",$3,f);
+}
+|expr : expr FLTIMES expr {
+	char* e = strcat("e",atoi(exprlblnb));
+	char* f = strcat("e",atoi(exprlblnb));
+	empile_expr(e);
+	empile_expr(f);
+	dprintf("trexpr* %s trexpr_create(FLOAT, %d);\n",$1,e);
+    dprintf("trexpr* %s = trexpr_create_composite(FLTIMES, %s, %s, trtype_create_pol(%d) );\n",e,f, get_next_pol); 
+	dprintf("trexpr* %s trexpr_create(FLOAT, %d);\n",$3,f);
+}
+|expr : expr FLDIVIDE expr {
+	char* e = strcat("e",atoi(exprlblnb));
+	char* f = strcat("e",atoi(exprlblnb));
+	empile_expr(e);
+	empile_expr(f);
+	dprintf("trexpr* %s trexpr_create(FLOAT, %d);\n",$1,e);
+    dprintf("trexpr* %s = trexpr_create_composite(FLDIVIDE, %s, %s, trtype_create_pol(%d) );\n",e,f, get_next_pol); 
+	dprintf("trexpr* %s trexpr_create(FLOAT, %d);\n",$3,f);
+}
+|expr : FUNCTION 
 %%
 
 int main(int argc, char** argv){
@@ -133,6 +162,8 @@ void prelude(){
 	dprintf(fd,"#include \"typecontr.h\"\n");
 	dprintf(fd,"#include \"typetree.h\"\n\n");
 	dprintf(fd,"int main(void) {\n");
+	dprintf(fd,"	env * enviro = new_context();\n"
+
 }
 
 void epilogue() {
