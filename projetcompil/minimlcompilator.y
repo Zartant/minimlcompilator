@@ -39,12 +39,14 @@ void epilogue();
 
 
 
+
 %%
 
 int main(int argc, char** argv){
 	//on déclare l'environnement
 	prelude();
-	
+	yyparse();
+	epilogue();
 }
 
 void prelude(){
@@ -62,5 +64,5 @@ void prelude(){
 
 void epilogue() {
 	dprintf(fd,"\t}\n}\n");
-
+	close(fd);
 }
