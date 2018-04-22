@@ -82,14 +82,16 @@ int main(void) {
     trexpr *f2 = trexpr_create_fun(x, f, trtype_create_pol(-1)); */
     
     
-    //Expression suivante : let f = function x -> function c -> 3 :: (c@x);;
-    trexpr *c1 = trexpr_create_pol(1, "c");
-    trexpr *x1 = trexpr_create_pol(2, "x");
-    trexpr *c2 = trexpr_create_pol(3, "c");
-    trexpr *x2 = trexpr_create_pol(4, "x");
-    trexpr *conc = trexpr_create_composite(CONCATLIST, c2, x2, trtype_create_pol(5));
+    //Expression suivante : let f = function x -> function c -> ("l'ocaml c'est magique",3) :: (c@x);;
+    char chaine1[3] = "c";
+    char chaine2[3] = "x";
+    trexpr *c1 = trexpr_create_pol(1, chaine1);
+    trexpr *x1 = trexpr_create_pol(2, chaine2);
+    trexpr *c2 = trexpr_create_pol(3, chaine1);
+    trexpr *x2 = trexpr_create_pol(4, chaine2);
+    trexpr *conc = trexpr_create_composite(CONCATLIST, x2, c2, trtype_create_pol(5));
     
-    char v[50] = "";
+    char v[50] = "L'ocaml c'est magique";
     int v2 = 3;
     trexpr *texpr[2];
     texpr[0] = trexpr_create(STRING, v, "");
@@ -100,15 +102,9 @@ int main(void) {
     trexpr *f = trexpr_create_fun(x1, f1, trtype_create_pol(7)); 
     printf("patate\n");
     //add_to_a_context(affect, ctx, g); 
-    apply_context((&(f)), ctx, g);
-    printf("\nG valeurs : \n");
-    print_constraint_set(g);
     
-    infer_type(g);
-    printf("\nG valeurs : \n");
-    print_constraint_set(g);
     
-    int n1 = 6;
+ /* int n1 = 6;
     int n2 = 2;
     int n3 = 3;
     trexpr *b1 = trexpr_create(INTEGER, &n1, "");
@@ -120,29 +116,59 @@ int main(void) {
     trexpr *tbexp = trexpr_upletfuse(tb, 2, trtype_create_pol(5));
     trexpr *p2 = trexpr_create_composite(PUTLIST, tbexp, trexpr_create(LIST, NULL, ""), trtype_create_pol(2));
     trexpr *p1 = trexpr_create_composite(PUTLIST, b1, p2, trtype_create_pol(3));
+    */
     
-    trexpr *param1 = trexpr_create_composite(APPLY, f, trexpr_create(LIST,NULL, ""), trtype_create_pol(19));
-    trexpr *param2 = trexpr_create_composite(APPLY, param1, trexpr_create(LIST,NULL, ""), trtype_create_pol(19));
     
-    /*
-    if (evaluate_expr(&f, ctx) == -1) {
+    
+    trexpr *xstring = trexpr_create(STRING, "test", "arg");
+    int xvalue = 8;
+    trexpr *xint = trexpr_create(INTEGER, &xvalue, "");
+    trexpr *xtab[2];
+    xtab[0] = xstring;
+    xtab[1] = xint;
+    trexpr *xcouple = trexpr_upletfuse(xtab, 2, trtype_create_pol(60));
+    
+    trexpr *xfactor = trexpr_create_composite(PUTLIST, xcouple, trexpr_create(LIST, NULL, ""), trtype_create_pol(66));
+    
+     trexpr *cstring = trexpr_create(STRING, "bloublou", "arg");
+    int cvalue = 42;
+    trexpr *cint = trexpr_create(INTEGER, &cvalue, "");
+    trexpr *ctab[2];
+    ctab[0] = cstring;
+    ctab[1] = cint;
+    trexpr *ccouple = trexpr_upletfuse(ctab, 2, trtype_create_pol(59));
+    
+    trexpr *cfactor = trexpr_create_composite(PUTLIST, ccouple, trexpr_create(LIST, NULL, ""), trtype_create_pol(68));
+    //add_value(ctx, "c", xfactor);
+    trexpr *param1 = trexpr_create_composite(APPLY, f, xfactor, trtype_create_pol(19));
+    trexpr *param2 = trexpr_create_composite(APPLY, param1,copy_expr(xfactor), trtype_create_pol(147)); 
+    apply_context((&(param2)), ctx, g);
+    printf("\nG valeurs : \n");
+    print_constraint_set(g);
+    
+    infer_type(g);
+    printf("\nG valeurs : \n");
+    print_constraint_set(g);
+    if (evaluate_expr(&param2, ctx) == -1) {
 		printf("error");
+		printf("Res : ");print_expr(param2);printf("\n");
 	} else {
    
-    printf("Res : ");print_expr(f);printf("\n");
-}*/
-    trexpr *cpy = copy_expr(p1);
+    printf("Res : ");print_expr(param2);printf("\n");
+	}
+    /*trexpr *cpy = copy_expr(p1);
     printf("Test copy : "); print_expr(cpy); printf("\n");
 	env *envi = new_context();
-	char chaine[
+	char chaine[3] = "c";
 	add_value(envi, chaine, cpy);
 	print_env(envi);
+	print_expr(getvar(envi, chaine));
 	trexpr *eval1 = trexpr_create_pol(1, chaine);
-	evaluate_expr(&eval1, ctx);
+	evaluate_expr(&eval1, envi);
 	if (eval1 == NULL) {
 		printf("à l'aide");
 	} else {
 		print_expr(eval1);
-	}
+	}*/
     return 0; 
 }

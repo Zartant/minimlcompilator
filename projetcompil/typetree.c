@@ -123,6 +123,7 @@ strtype *strtype_create_composite(mloper oper, trtype *a, trtype *b) {
 
 //Des fonctions généralistes
 void trtype_print(const trtype *ty) {
+	if (ty == NULL) return;
 	if (!(ty -> iscomplex)) {
 		//char c = (char) (ty -> poltype + (int) 'a');
 		//printf("%c", c);

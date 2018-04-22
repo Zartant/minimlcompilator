@@ -55,8 +55,7 @@ void print_env (env *e) {
 		print_expr(p -> expr);
 		p = p -> next;
 	}
-	if (p == NULL) return NULL;
-	return p -> expr;
+
 }
 
 void add_to_a_context (trexpr **exp, env *ctx, G *ctrset) {
@@ -190,7 +189,20 @@ void *cpyvaluexpr(trexpr *expr) {
 		int *v = malloc(sizeof(*v));
 		*v = *((int *)(expr -> value));
 		return v;
+	} else if (expr -> type == STRING) {
+		char *copiechaine = malloc(50);
+		strcpy(copiechaine, expr -> value);
+		return copiechaine;
+	} else if (expr -> type == FLOAT) {
+		float *v = malloc(sizeof(*v));
+		*v = *((float *)(expr -> value));
+		return v;
+	} else if (expr -> type == BOOLEAN) {
+		int *v = malloc(sizeof(*v));
+		*v = *((int *)(expr -> value));
+		return v;
 	}
+	return NULL;
 }
 
 trexpr *copy_expr (trexpr *expr) {
@@ -206,16 +218,53 @@ trexpr *copy_expr (trexpr *expr) {
 	ret -> op1 = copy_expr(expr -> op1);
 	ret -> op2 = copy_expr(expr -> op2);
 	ret -> value = cpyvaluexpr(expr);
+	ret -> oper = expr -> oper;
+	ret -> param = copy_expr(expr -> param);
+	ret -> res = copy_expr(expr -> res);
 	return ret;
 }
 
 
+void eval_apply_remplace(trexpr **expr, trexpr* param, char *label) {
+	if (*expr == NULL) return;
+	if ((*expr) -> type == POLY) {
+		if (strcmp ((*expr) -> ID, label) == 0) {
+			*expr = param;
+		}
+	}
+	eval_apply_remplace(&((*expr) -> op1), param, label);
+	eval_apply_remplace(&((*expr) -> op2), param, label);
+	eval_apply_remplace(&((*expr) -> next), param, label);
+	eval_apply_remplace(&((*expr) -> son), param, label);
+	eval_apply_remplace(&((*expr) -> param), param, label);
+	eval_apply_remplace(&((*expr) -> res), param, label);      
+}
+
+int eval_apply (trexpr **expr, env *ctx) {
+	
+	if (evaluate_expr(&((*expr) -> op2), ctx) == -1) {
+		printf("\npbevalop2\n");
+		return -1;
+	}
+	
+	if (evaluate_expr(&((*expr) -> op1), ctx) == -1 || (*expr) -> op1 -> type != FUN) {
+		printf("\npbevalop1\n");
+		return -1;
+	}
+	eval_apply_remplace(&((*expr) -> op1 -> res), (*expr) -> op2, (*expr) -> op1 -> param -> ID);
+	*expr = ((*expr) -> op1 -> res);
+	return 0;
+	
+	
+}
 
 int eval_operation(trexpr **expr, env *ctx) {
 	int r1 = evaluate_expr(&((*expr) -> op1), ctx);
 	int r2 = evaluate_expr(&((*expr) -> op2), ctx);
 	//Test retour r1
-	
+	if (r1 == -1 || r2 == -1) {
+		return -1;
+	}
 	if ((*expr)-> type == OPE) {
 		if ((*expr) -> oper == INTPLUS) {
 			int *v1 = malloc(sizeof(int));
@@ -223,30 +272,99 @@ int eval_operation(trexpr **expr, env *ctx) {
 		    int *v2 = malloc(sizeof(int));
 		    v2 = (*expr) -> op2 -> value;
 		    int *ret = malloc(sizeof(int));
-		    *ret = *v1 + *v2;
+		    *ret = (*v1) + (*v2);
 		    *expr = trexpr_create(INTEGER, ret, ""); 
-		} else if ((*expr) -> oper == APPLY) {
-			env *nctx = new_context();
-			concat_context(nctx, ctx);
-			add_value(nctx, (*expr) -> op1 -> param -> ID , copy_expr((*expr) -> op2));
-			*expr = (*expr) -> op1 -> res;
-			evaluate_expr(expr, nctx); //Test retour
+		} else if ((*expr) -> oper == INTMINUS){
+			int *v1 = malloc(sizeof(int));
+			v1 = (*expr) -> op1 -> value;
+		    int *v2 = malloc(sizeof(int));
+		    v2 = (*expr) -> op2 -> value;
+		    int *ret = malloc(sizeof(int));
+		    *ret = (*v1) - (*v2);
+		    *expr = trexpr_create(INTEGER, ret, ""); 
+			
+		} else if ((*expr) -> oper == INTMULT){
+			int *v1 = malloc(sizeof(int));
+			v1 = (*expr) -> op1 -> value;
+		    int *v2 = malloc(sizeof(int));
+		    v2 = (*expr) -> op2 -> value;
+		    int *ret = malloc(sizeof(int));
+		    *ret = (*v1) * (*v2);
+		    *expr = trexpr_create(INTEGER, ret, ""); 
+			
+		} else if ((*expr) -> oper == INTDIV){
+			int *v1 = malloc(sizeof(int));
+			v1 = (*expr) -> op1 -> value;
+		    int *v2 = malloc(sizeof(int));
+		    v2 = (*expr) -> op2 -> value;
+		    int *ret = malloc(sizeof(int));
+		    *ret = (*v1) / (*v2);
+		    *expr = trexpr_create(INTEGER, ret, ""); 
+			
+		} else if ((*expr) -> oper == FLOATPLUS){
+			float *v1 = malloc(sizeof(float));
+			v1 = (*expr) -> op1 -> value;
+		    float *v2 = malloc(sizeof(float));
+		    v2 = (*expr) -> op2 -> value;
+		    float *ret = malloc(sizeof(float));
+		    *ret = (*v1) + (*v2);
+		    *expr = trexpr_create(FLOAT, ret, ""); 
+			
+		} else if ((*expr) -> oper == FLOATMINUS){
+			float *v1 = malloc(sizeof(float));
+			v1 = (*expr) -> op1 -> value;
+		    float *v2 = malloc(sizeof(float));
+		    v2 = (*expr) -> op2 -> value;
+		    float *ret = malloc(sizeof(float));
+		    *ret = (*v1) - (*v2);
+		    *expr = trexpr_create(FLOAT, ret, ""); 
+			
+		} else if ((*expr) -> oper == FLOATMULT){
+			float *v1 = malloc(sizeof(float));
+			v1 = (*expr) -> op1 -> value;
+		    float *v2 = malloc(sizeof(float));
+		    v2 = (*expr) -> op2 -> value;
+		    float *ret = malloc(sizeof(float));
+		    *ret = (*v1) * (*v2);
+		    *expr = trexpr_create(FLOAT, ret, ""); 
+			
+		} else if ((*expr) -> oper == FLOATDIV){
+			float *v1 = malloc(sizeof(float));
+			v1 = (*expr) -> op1 -> value;
+		    float *v2 = malloc(sizeof(float));
+		    v2 = (*expr) -> op2 -> value;
+		    float *ret = malloc(sizeof(float));
+		    *ret = (*v1) / (*v2);
+		    *expr = trexpr_create(FLOAT, ret, ""); 
+			
+		} else if ((*expr) -> oper == STRCNT){
+			char ret[50] = "";
+			strcat(ret, (*expr) -> op1 -> value);
+			strcat(ret, (*expr) -> op2 -> value);
+		    *expr = trexpr_create(STRING, ret, ""); 
+			
 		} else if ((*expr) -> oper == CONCATLIST) {
 			if ((*expr) -> op1 -> type == LIST) {
 				*expr = (*expr) -> op2;
-			} else if ((*expr)-> op1 -> type == PUTLIST){
-				trexpr *p = (*expr) -> op1 -> op2;
+			} else if ((*expr)-> op1 -> oper == PUTLIST){
+				
+				trexpr *p = ((*expr) -> op1 -> op2);
 				(*expr) -> op1 -> op2 = (*expr) -> op2;
-			    (*expr) -> op2 = (*expr) -> op1;
-			    (*expr) -> op1 = p;
+				(*expr) -> op2 = (*expr) -> op1;
+				(*expr) -> op1 = p;
+				return evaluate_expr(expr, ctx);
+			} else {
+				return -1;
 			}
-		}
+			//AJOUT DU BOOLEAN (entier 0 ou 1)
+		} 
 	}
+	return 0;
 }
 
 int evaluate_expr(trexpr **expr, env *ctx) {
 	if ((*expr) == NULL) {
-		return -1;
+		//return -1;
 	}
 	if ((*expr) -> type == POLY) {
 		printf("rempl %s", (*expr) -> ID);
@@ -257,17 +375,38 @@ int evaluate_expr(trexpr **expr, env *ctx) {
 		}
 		return 0;
 	} else if ((*expr) -> type == OPE) {
-		return eval_operation(expr, ctx);
+		if ((*expr) -> op2 -> type == POLY || (*expr) -> op1 -> type == POLY) return 0;
+		if ((*expr) -> oper == APPLY) {
+			if (eval_apply(expr, ctx) == -1) {
+				return -1;
+			} else {
+				return evaluate_expr(expr, ctx);
+			}
+		} else if ((*expr) -> oper == LETIN) {
+			env *nctx = new_context();
+			concat_context(nctx, ctx);
+			if (evaluate_expr(&((*expr) -> op1 -> op2), nctx) != 0) {
+				return -1;
+			}
+			add_value(nctx, (*expr) -> op1 -> op1 -> ID, (*expr) -> op1 -> op2);
+			*expr = (*expr) -> op2;
+			return evaluate_expr(expr, nctx);
+		} else {
+			return eval_operation(expr, ctx);
+		}
 	} else if ((*expr) -> type == FUN) {
-		return evaluate_expr(&((*expr) -> param), ctx);
-		return evaluate_expr(&((*expr) -> res), ctx);
-	}else if ((*expr) -> type == TREE) {
+		//return evaluate_expr(&((*expr) -> param), ctx);
+		//return evaluate_expr(&((*expr) -> res), ctx);
+	} else if ((*expr) -> type == TREE) {
 		trexpr **p = &((*expr) -> son);
 		while (*p != NULL) {
-			evaluate_expr(p, ctx);
+			if (evaluate_expr(p, ctx) == -1) {
+				return -1;
+			}
 			p = &((*p) -> next);
 		}
 	}
+	return 0;
 		
 }
 
@@ -302,6 +441,16 @@ void print_expr(trexpr *expr) {
 		printf("[]");
 	} else if (expr -> type == INTEGER) {
 		printf("%d", *((int *)(expr -> value)));
+	} else if (expr -> type == STRING) {
+		printf("\"%s\"", (char*)(expr -> value));
+	} else if (expr -> type == FLOAT) {
+		printf("%f", *((float *)(expr -> value)));
+	}  else if (expr -> type == INTEGER) {
+		if (*((int *)(expr -> value)) == 0) {
+			printf("false");
+		} else {
+			printf("true");
+		}
 	}
 	
 }

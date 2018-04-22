@@ -52,6 +52,9 @@ trexpr *trexpr_create(type_ml t, void *value, char *id){
 			strcpy(ret -> ID, id);
 		}
 	}
+	if (t == LIST) {
+		ret -> treetype == trtype_create_complex(strtype_create_list(trtype_create_pol(404))); //TYPE POLYMORPHE OUI
+	}
 	ret -> res = NULL;
 	ret -> param = NULL;
 	ret -> type = t;
@@ -130,6 +133,8 @@ trexpr *trexpr_create_composite(mloper oper, trexpr *a, trexpr *b, trtype *t) {
 	ret -> op1 = a;
 	ret -> op2 = b;
 	ret -> value = NULL;
+	ret -> param = NULL;
+	ret -> res = NULL;
 	return ret;
 }
 
