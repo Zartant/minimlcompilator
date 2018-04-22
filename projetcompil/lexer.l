@@ -4,7 +4,7 @@
 %option noyywrap
 %%
 #*\n 	{} // On vire d'abord les commentaires
-["]*["]			{return STRING;}
+["][a-z]*["]			{return STRING;}
 [in]				{return IN;}
 [if]				{return IF;}
 [then]			{return THEN;}
